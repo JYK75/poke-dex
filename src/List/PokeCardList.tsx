@@ -1,8 +1,16 @@
 import styled from '@emotion/styled'
-
+import { useEffect } from 'react'
+import { fetchPokemons } from '../Service/PokemonService'
 import PokeCard from "./PokeCard"
 
 const PokeCardList = () => {
+  useEffect(() => {
+    (async () => {
+      const result = await fetchPokemons()
+      console.log(result)
+    })()
+  }, [])
+
   return (
     <List>
       {

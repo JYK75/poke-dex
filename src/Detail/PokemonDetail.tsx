@@ -1,6 +1,7 @@
 import styled from "@emotion/styled"
 import { useEffect, useState } from "react"
 import { useParams } from "react-router-dom"
+import { PokeImageSkeleton } from "../Common/PokeImageSkeleton"
 import PokeMarkChip from "../Common/PokeMarkChip"
 import { fetchPokemonDetail, PokemonDetailType } from "../Service/PokemonService"
 
@@ -20,7 +21,17 @@ const PokemonDetail = () => {
   }, [name])
 
   if(!name || !pokemon) {
-    return null; // todo: name이 없을 때
+    return (
+      <Container>
+        <ImageContainer>
+          <PokeImageSkeleton />
+        </ImageContainer>
+        <Divider />
+        <Footer>
+          <PokeMarkChip />
+        </Footer>
+      </Container>
+    )
   }
 
   return (
@@ -58,14 +69,16 @@ const PokemonDetail = () => {
         <h2>능력치</h2>
         <Table>
           <tbody>
-            <TableRow>
-              <TableHeader>hp</TableHeader>
-              <td>45</td>
-            </TableRow>
-            <TableRow>
-              <TableHeader>attack</TableHeader>
-              <td>49</td>
-            </TableRow>
+            {
+              pokemon.baseStats.map(stat => {
+                return (
+                  <TableRow key={stat.name}>
+                    <TableHeader>{stat.name}</TableHeader>
+                    <td>{stat.value}</td>
+                  </TableRow>
+                )
+              })
+            }
           </tbody>
         </Table>
       </Body>
@@ -89,6 +102,7 @@ const ImageContainer = styled.section`
   justify-content: center;
   align-items: center;
   margin: 8px 0;
+  min-height: 350px;
 `
 const Image = styled.img`
   width: 350px;

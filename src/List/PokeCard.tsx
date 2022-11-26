@@ -1,6 +1,7 @@
 import styled from '@emotion/styled'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { PokeImageSkeleton } from '../Common/PokeImageSkeleton'
 import PokeMarkChip from '../Common/PokeMarkChip'
 import PokeNameChip from '../Common/PokeNameChip'
 import { fetchPokemonDetail, PokemonDetailType } from '../Service/PokemonService'
@@ -25,7 +26,19 @@ const PokeCard = (props:PokeCardProps) => {
   }, [props.name])
 
   if(!pokemon) {
-    return null; // TODO: 화면이 로딩중일때 표시
+    return (
+      <Item color={'#fff'}>
+        <Header>
+          <PokeNameChip name={'포켓몬'} color={'#ffca09'} id={0} />
+        </Header>
+        <Body>
+          <PokeImageSkeleton />
+        </Body>
+        <Footer>
+          <PokeMarkChip />
+        </Footer>    
+      </Item>
+    )
   }
 
   return (

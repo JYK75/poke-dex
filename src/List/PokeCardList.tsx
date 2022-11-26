@@ -1,6 +1,8 @@
 import styled from '@emotion/styled'
 import { useEffect, useState } from 'react'
 import { fetchPokemons, PokemonListResponseType } from '../Service/PokemonService'
+import useInfiniteScroll from 'react-infinite-scroll-hook'
+
 import PokeCard from "./PokeCard"
 
 const PokeCardList = () => {
@@ -10,6 +12,21 @@ const PokeCardList = () => {
     results: []
   })
 
+  const [infinityRef] = useInfiniteScroll( {
+    loading: false,
+    hasNextPage: pokemons.next !== '',
+    onLoadMore: async () => {
+      const morePokemons = await fetchPokemons(pokemons.next)
+      setPokemons({
+        ...morePokemons,
+        results: [...pokemons.results, ...morePokemons.results]
+      })
+    }, // 바닥에 닿았을 때 호출하는 거
+    disabled: false,
+    rootMargin: '0px 0px 400px 0px'
+  })
+
+
   useEffect(() => {
     (async () => {
       const pokemons = await fetchPokemons()
@@ -18,18 +35,28 @@ const PokeCardList = () => {
   }, [])
 
   return (
-    <List>
-      {
-        pokemons.results.map((pokemon, index) => {
-          return (
-            <PokeCard key={`${pokemon.name}_${index}`}
-            name={pokemon.name} />
-          )
-        })
-      }
-    </List>
+    <>
+      <List>
+        {
+          pokemons.results.map((pokemon, index) => {
+            return (
+              <PokeCard key={`${pokemon.name}_${index}`}
+              name={pokemon.name} />
+            )
+          })
+        }
+      </List>
+      <Loading ref={infinityRef}>
+        Loading...
+      </Loading>
+    </>
   )
 }
+
+const Loading = styled.div`
+  display: flex;
+  justify-content: center;
+`
 
 const List = styled.ul`
   list-style: none;

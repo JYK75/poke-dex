@@ -1,14 +1,32 @@
 import styled from "@emotion/styled"
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
 import PokeMarkChip from "../Common/PokeMarkChip"
+import { fetchPokemonDetail, PokemonDetailType } from "../Service/PokemonService"
 
 const TempImgUrl = 'https://mblogthumb-phinf.pstatic.net/20160817_259/retspe_14714118890125sC2j_PNG/%C7%C7%C4%AB%C3%F2_%281%29.png?type=w800'
 
-
 const PokemonDetail = () => {
+  const { name } = useParams()
+  const [pokemon, setPokemon] = useState<PokemonDetailType | null>(null)
+
+  useEffect(() => {
+    if(!name) return;
+
+    (async () => {
+      const detail = await fetchPokemonDetail(name)
+      setPokemon(detail)
+    })()
+  }, [name])
+
+  if(!name || !pokemon) {
+    return null; // todo: name이 없을 때
+  }
+
   return (
     <Container>
       <ImageContainer>
-        <Image src={TempImgUrl} alt="포켓몬 이미지"/>
+        <Image src={pokemon.images.dreamWorldFront} alt={pokemon.koreanName}/>
       </ImageContainer>
       <Divider />
       <Body>
@@ -17,11 +35,23 @@ const PokemonDetail = () => {
           <tbody>
             <TableRow>
               <TableHeader>번호</TableHeader>
-              <td>1</td>
+              <td>{pokemon.id}</td>
             </TableRow>
             <TableRow>
               <TableHeader>이름</TableHeader>
-              <td>이상해씨</td>
+              <td>{`${pokemon.koreanName} (${pokemon.name})`}</td>
+            </TableRow>
+            <TableRow>
+              <TableHeader>타입</TableHeader>
+              <td>{pokemon.types.toString()}</td>
+            </TableRow>
+            <TableRow>
+              <TableHeader>키</TableHeader>
+              <td>{`${pokemon.height} m`}</td>
+            </TableRow>
+            <TableRow>
+              <TableHeader>몸무게</TableHeader>
+              <td>{`${pokemon.weight} kg`}</td>
             </TableRow>
           </tbody>
         </Table>

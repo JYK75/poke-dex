@@ -1,26 +1,25 @@
 import styled from '@emotion/styled'
 import { useEffect, useState } from 'react'
-import { fetchPokemons, PokemonListResponseType } from '../Service/PokemonService'
 import useInfiniteScroll from 'react-infinite-scroll-hook'
 
 import PokeCard from "./PokeCard"
+import { RootState, useAppDispatch } from '../Store'
+import { fetchPokemons } from '../Store/pokemonsSlice'
+import { useSelector } from 'react-redux'
 
 const PokeCardList = () => {
-  const [pokemons, setPokemons] = useState<PokemonListResponseType>({
-    count: 0,
-    next: '',
-    results: []
-  })
+  const dispatch = useAppDispatch()
+  const { pokemons } = useSelector((state: RootState) => state.pokemons)
 
   const [infinityRef] = useInfiniteScroll( {
     loading: false,
     hasNextPage: pokemons.next !== '',
     onLoadMore: async () => {
-      const morePokemons = await fetchPokemons(pokemons.next)
-      setPokemons({
-        ...morePokemons,
-        results: [...pokemons.results, ...morePokemons.results]
-      })
+      dispatch(fetchPokemons(pokemons.next));
+      // setPokemons({
+      //   ...morePokemons,
+      //   results: [...pokemons.results, ...morePokemons.results]
+      // })
     }, // 바닥에 닿았을 때 호출하는 거
     disabled: false,
     rootMargin: '0px 0px 400px 0px'
@@ -28,11 +27,13 @@ const PokeCardList = () => {
 
 
   useEffect(() => {
-    (async () => {
-      const pokemons = await fetchPokemons()
-      setPokemons(pokemons)
-    })()
-  }, [])
+    dispatch(fetchPokemons());
+
+    // (async () => {
+    //   const pokemons = await fetchPokemonsAPI()
+    //   setPokemons(pokemons)
+    // })()
+  }, [dispatch])
 
   return (
     <>
